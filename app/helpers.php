@@ -51,7 +51,9 @@ function _get_request_info($dir = null, $file = null) {
     );
 }
 
-function _clean_path(string $path) {
+function _clean_path($path) {
+
+    $path = $path === null ? '' : $path;
 
     $path = preg_replace('#((\/+)?(\.\.)+(\/+)?)+#i', '/', $path);
     $path = preg_replace('#(\/\.\/)+#i', '/', $path);
@@ -87,7 +89,7 @@ function _get_file_list(string $dir, bool $asObj = false) {
 		}
 
         if ($asObj) {
-            return (object) $fileList;		// Object of Filelist
+            return json_decode(json_encode($fileList), false);		// Object of Filelist
         }
 
         return $fileList;

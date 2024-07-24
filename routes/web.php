@@ -4,11 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FileManagerController;
 
 
-Route::group(['middleware' => 'basicAuth'], function () {
+Route::group(['middleware' => App\Http\Middleware\BasicAuth::class], function () {
 
 	Route::get('/', [FileManagerController::class, 'index'])->name('index');
 
-	Route::group(['middleware' => 'tokenValidate'], function () {
+	Route::group(['middleware' => App\Http\Middleware\TokenValidation::class], function () {
 		Route::get('/viewFile', [FileManagerController::class, 'viewFile'])->name('viewFile');
 		Route::post('/uploadFile', [FileManagerController::class, 'uploadFile'])->name('uploadFile');	// for direct upload
 		Route::post('/uploadFile/chunk', [FileManagerController::class, 'uploadChunk'])->name('uploadChunk');
