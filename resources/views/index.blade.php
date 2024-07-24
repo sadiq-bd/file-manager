@@ -216,11 +216,11 @@
 <script>
 
   const chunkSize = {{ env('FILE_UPLOAD_CHUNK_SIZE', 1024*1024) }};
+  let uploadBtn = document.querySelector('#uploadBtn');
   let uploadId = null;
 
   document.querySelector('form#fileUploader').addEventListener('submit', async (e) => {
     e.preventDefault();
-    let uploadBtn = document.querySelector('#uploadBtn');
     uploadBtn.setAttribute('disabled', true);
     uploadBtn.innerHTML = 'Uploading File(s)... Please wait!';
     await uploadFiles();
@@ -272,8 +272,8 @@
           }),
       });
     }
-
-    alert('Upload completed');
+    
+    uploadBtn.innerHTML = 'Upload completed... reloading!';
     window.location.reload();
   }
 
