@@ -137,57 +137,87 @@ function _token_generate() {
 
 
 function removeDir($dir) {
+   
     $dir = rtrim($dir, '/');
-    $dirFiles = array_diff(scandir($dir), array('.', '..'));
 
-    foreach ($dirFiles as $df) {
-        if (filetype($dir . '/' . $df) == 'dir') {
-            removeDir($dir . '/' . $df);
-        } else {
-            unlink($dir . '/' . $df);
+    if (isUseShellCommandsForFileHandling()) {
+
+        exec('rm -rf ' . escapeshellarg($dir));
+
+    } else {
+        
+        $dirFiles = array_diff(scandir($dir), array('.', '..'));
+
+        foreach ($dirFiles as $df) {
+            if (filetype($dir . '/' . $df) == 'dir') {
+                removeDir($dir . '/' . $df);
+            } else {
+                unlink($dir . '/' . $df);
+            }
         }
-    }
 
-    rmdir($dir);
+        rmdir($dir);
+    }
 }
 
 
 function copyDir($dir, $to) {
     $dir = rtrim($dir, '/');
-    $dirFiles = array_diff(scandir($dir), array('.', '..'));
 
-    foreach ($dirFiles as $df) {
-        if (filetype($dir . '/' . $df) == 'dir') {
-            copyDir($dir . '/' . $df, $to . '/' . $df);
-        } else {
-            if (!file_exists($to)) mkdir($to, 0777, true);
-            copy($dir . '/' . $df, $to . '/' . $df);
+    if (isUseShellCommandsForFileHandling()) {
+        
+        exec('cp -r ' . escapeshellarg($dir) . ' ' . escapeshellarg($to));
+
+    } else {
+
+        $dirFiles = array_diff(scandir($dir), array('.', '..'));
+
+        foreach ($dirFiles as $df) {
+            if (filetype($dir . '/' . $df) == 'dir') {
+                copyDir($dir . '/' . $df, $to . '/' . $df);
+            } else {
+                if (!file_exists($to)) mkdir($to, 0777, true);
+                copy($dir . '/' . $df, $to . '/' . $df);
+            }
         }
+        
     }
-
 }
 
 
 function moveDir($dir, $to, $shouldRemoveDirs = true) {
+    
     $dir = rtrim($dir, '/');
-    $dirFiles = array_diff(scandir($dir), array('.', '..'));
 
-    foreach ($dirFiles as $df) {
-        if (filetype($dir . '/' . $df) == 'dir') {
-            moveDir($dir . '/' . $df, $to . '/' . $df, $shouldRemoveDirs);
-        } else {
-            if (!file_exists($to)) mkdir($to, 0777, true);
-            if (copy($dir . '/' . $df, $to . '/' . $df)) {
-                unlink($dir . '/' . $df);
+    if (isUseShellCommandsForFileHandling()) {
+        
+        exec('mv ' . escapeshellarg($dir) . ' ' . escapeshellarg($to));
+
+    } else {
+
+        $dirFiles = array_diff(scandir($dir), array('.', '..'));
+
+        foreach ($dirFiles as $df) {
+            if (filetype($dir . '/' . $df) == 'dir') {
+                moveDir($dir . '/' . $df, $to . '/' . $df, $shouldRemoveDirs);
             } else {
-                $shouldRemoveDirs = false;
+                if (!file_exists($to)) mkdir($to, 0777, true);
+                if (copy($dir . '/' . $df, $to . '/' . $df)) {
+                    unlink($dir . '/' . $df);
+                } else {
+                    $shouldRemoveDirs = false;
+                }
             }
         }
-    }
 
-    if ($shouldRemoveDirs) {
-        removeDir($dir);
-    }
+        if ($shouldRemoveDirs) {
+            removeDir($dir);
+        }
 
+    }
 }
 
+
+function isUseShellCommandsForFileHandling() {
+    return (bool) env('USE_SHELL_COMMANDS_FOR_FILE_HANDLING', true);
+}

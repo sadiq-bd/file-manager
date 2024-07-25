@@ -295,7 +295,11 @@ class FileManagerController extends Controller
 
 				$reqInfo = _get_request_info(null, $rf);
 				if (is_file($reqInfo['absFile']) && file_exists($reqInfo['absFile'])) {
-					unlink($reqInfo['absFile']);
+					if (isUseShellCommandsForFileHandling()) {
+						exec('rm -f ' . escapeshellarg($reqInfo['absFile']));
+					} else {
+						unlink($reqInfo['absFile']);
+					}
 				} else {
 					removeDir($reqInfo['absFile']);	// Remove dir recursively
 				}
@@ -333,7 +337,12 @@ class FileManagerController extends Controller
 
 					$reqInfo = _get_request_info(null, $rf);
 					if (is_file($reqInfo['absFile']) && file_exists($reqInfo['absFile'])) {
-						copy($reqInfo['absFile'], rtrim($absTo, '/') . '/' . $reqInfo['requestFile']);
+						if (isUseShellCommandsForFileHandling()) {
+							exec('cp ' . escapeshellarg($reqInfo['absFile']) . ' ' . escapeshellarg(rtrim($absTo, '/') . '/' . $reqInfo['requestFile']));
+						} else {
+							copy($reqInfo['absFile'], rtrim($absTo, '/') . '/' . $reqInfo['requestFile']);
+						}
+						
 					} else {
 						copyDir($reqInfo['absFile'], rtrim($absTo, '/') . '/' . $reqInfo['requestFile']);	// copy dir recursively
 					}
@@ -374,9 +383,14 @@ class FileManagerController extends Controller
 
 					$reqInfo = _get_request_info(null, $rf);
 					if (is_file($reqInfo['absFile']) && file_exists($reqInfo['absFile'])) {
-						if (copy($reqInfo['absFile'], rtrim($absTo, '/') . '/' . $reqInfo['requestFile'])) {
-							unlink($reqInfo['absFile']);
+						if (isUseShellCommandsForFileHandling()) {
+							exec('mv ' . escapeshellarg($reqInfo['absFile']) . ' ' . escapeshellarg(rtrim($absTo, '/') . '/' . $reqInfo['requestFile']));
+						} else {
+							if (copy($reqInfo['absFile'], rtrim($absTo, '/') . '/' . $reqInfo['requestFile'])) {
+								unlink($reqInfo['absFile']);
+							}
 						}
+						
 					} else {
 						moveDir($reqInfo['absFile'], rtrim($absTo, '/') . '/' . $reqInfo['requestFile']);		// move dir recursively
 					}
@@ -408,13 +422,26 @@ class FileManagerController extends Controller
 				$reqFiles = [$requestFile];
 			}
 
-			if (class_exists('ZipArchive')) {
-				$zipper = new Zipper;
-				chdir($absDir);
-				$zipper->create('Archive_' . date('d_M_Y_H_i_s') . '.zip', $reqFiles);
+			$arcName = 'Archive_' . date('d_M_Y_H_i_s') . '.zip';
+			chdir($absDir);
+			
+			if (isUseShellCommandsForFileHandling()) {
+				$reqFilesShellEsc = [];
+				foreach ($reqFiles as $index => $f) {
+					$reqFilesShellEsc[$index] = escapeshellarg($f);
+				}
+				exec('zip "' . $arcName . '" ' . implode(' ', $reqFilesShellEsc));
 			} else {
-				return response('ZipArchive Extension not found!');
+				if (class_exists('ZipArchive')) {
+					
+					$zipper = new Zipper;
+
+					$zipper->create($arcName, $reqFiles);
+				} else {
+					return response('ZipArchive Extension not found!');
+				}
 			}
+			
 			
 		}
 
@@ -450,12 +477,16 @@ class FileManagerController extends Controller
 				$reqInfo = _get_request_info(null, $rf);
 
 				if (is_file($reqInfo['absFile']) && file_exists($reqInfo['absFile']) && pathinfo($reqInfo['absFile'], PATHINFO_EXTENSION) == 'zip') {
-					if (class_exists('ZipArchive')) {
-						if (!file_exists($absTo) && !is_file($absTo)) mkdir($absTo, 0777, true);
-						$zipper = new Zipper;
-						$zipper->unzip($reqInfo['absFile'], $absTo);
+					if (isUseShellCommandsForFileHandling()) {
+						exec('unzip "' . $reqInfo['absFile'] . '" -d ' . escapeshellarg($absTo));
 					} else {
-						return response('ZipArchive Extension not found!');
+						if (class_exists('ZipArchive')) {
+							if (!file_exists($absTo) && !is_file($absTo)) mkdir($absTo, 0777, true);
+							$zipper = new Zipper;
+							$zipper->unzip($reqInfo['absFile'], $absTo);
+						} else {
+							return response('ZipArchive Extension not found!');
+						}
 					}
 				}
 				

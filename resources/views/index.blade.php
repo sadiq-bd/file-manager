@@ -115,6 +115,8 @@
       </thead>
       <tbody>
         @php 
+          $totalFiles = 0;
+          $totalDirs = 0;
           $totalSizeOfFiles = 0;
         @endphp
         @foreach($fileList as $index => $file)
@@ -182,6 +184,9 @@
             @php
               if (!$file->isDir) { 
                 $totalSizeOfFiles += $file->fileSize;
+                $totalFiles++;
+              } else {
+                $totalDirs++;
               }
             @endphp
           @endif
@@ -189,7 +194,7 @@
         @endforeach
         <tr>
           <td></td>
-          <td><b style="color: #888;">Total Size of Files in {{ $currentDir == '.' || $currentDir == '' ? '/' : $currentDir }}</b></td>
+          <td><b style="color: #888;">Total <b style="color: #fff;">{{ $totalFiles }}</b> files and <b style="color: #fff;">{{ $totalDirs }}</b> folders in {{ $currentDir == '.' || $currentDir == '' ? '/' : $currentDir }}</b></td>
           <td><b style="color: #888;">{{ _format_size($totalSizeOfFiles) }}</b></td>
           <td></td>
           <td></td>
