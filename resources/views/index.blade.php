@@ -231,46 +231,62 @@
     const fileInput = document.getElementById('fileInput');
     const files = fileInput.files;
 
-    for (const file of files) {
+    let currentFile = 0;
+    while (currentFile < files.length) {
+      let file = files[currentFile];
       const totalChunks = Math.ceil(file.size / chunkSize);
       uploadId = Date.now(); // Generate a unique upload ID
 
-      for (let i = 0; i < totalChunks; i++) {
-          const start = i * chunkSize;
-          const end = Math.min(start + chunkSize, file.size);
-          const chunk = file.slice(start, end);
+      let currentChunk = 0;
+      while (currentChunk < totalChunks) {
+        const start = currentChunk * chunkSize;
+        const end = Math.min(start + chunkSize, file.size);
+        const chunk = file.slice(start, end);
 
-          const formData = new FormData();
-          formData.append('_file', chunk);
-          formData.append('chunk_number', i + 1);
-          formData.append('total_chunks', totalChunks);
-          formData.append('upload_id', uploadId);
+        const formData = new FormData();
+        formData.append('_file', chunk);
+        formData.append('chunk_number', currentChunk + 1);
+        formData.append('total_chunks', totalChunks);
+        formData.append('upload_id', uploadId);
 
-          formData.append('file', file.name);
-          formData.append('dir', '{{ $currentDir }}');
-          formData.append('_token', '{{ csrf_token() }}');
-          formData.append('_token_', '{{ _token_generate() }}');
+        formData.append('file', file.name);
+        formData.append('dir', '{{ $currentDir }}');
+        formData.append('_token', '{{ csrf_token() }}');
+        formData.append('_token_', '{{ _token_generate() }}');
 
-          await fetch('{{ route('uploadChunk') }}', {
-              method: 'POST',
-              body: formData,
-          });
+        let resp = await fetch('{{ route('uploadChunk') }}', {
+            method: 'POST',
+            body: formData
+        });
+        resp = await resp.json();
+        if (resp.status == 'success') {
+          currentChunk += 1;
+        }
+
+        let fname = file.name.length > 50 ? file.name.substring(0, 50) + '...' : file.name;
+        let percentage = Math.round((((currentChunk + 1) * chunkSize ) / file.size) * 100);
+        percentage = percentage > 100 ? 100 : percentage;
+        uploadBtn.innerHTML = 'Uploading '+ fname +' ( '+ percentage +' % )';
       }
 
-      await fetch('{{ route('completeUpload') }}', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-              upload_id: uploadId,
-              total_chunks: totalChunks,
-              file: file.name,
-              dir: '{{ $currentDir }}',
-              _token: '{{ csrf_token() }}',
-              _token_: '{{ _token_generate() }}'
-          }),
+      let resp = await fetch('{{ route('completeUpload') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            upload_id: uploadId,
+            total_chunks: totalChunks,
+            file: file.name,
+            dir: '{{ $currentDir }}',
+            _token: '{{ csrf_token() }}',
+            _token_: '{{ _token_generate() }}'
+        })
       });
+      resp = await resp.json();
+      if (resp.status == 'success') {
+        currentFile += 1;
+      }
     }
     
     uploadBtn.innerHTML = 'Upload completed... reloading!';

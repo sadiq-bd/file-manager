@@ -98,7 +98,7 @@ class FileManagerController extends Controller
         $chunkPath = env('FILE_TEMP_DIR', '') . '/' . $uploadId . '/' . $chunkNumber;
         $file->move(dirname($chunkPath), basename($chunkPath));
 
-        return response()->json(['status' => 'chunk uploaded']);
+        return response()->json(['status' => 'success']);
     }
 
     public function completeUpload(Request $request) {
@@ -141,7 +141,7 @@ class FileManagerController extends Controller
         fclose($fileHandle);
         rmdir(env('FILE_TEMP_DIR', '') . '/' . $uploadId); // Delete the chunk directory
 
-        return response()->json(['status' => 'upload completed']);
+        return response()->json(['status' => 'success']);
     }
 
 
