@@ -95,20 +95,14 @@ function _get_file_list(string $dir, bool $asObj = false) {
         return $fileList;
 }
 
-
-function _format_size(int $size) {
+function _format_size(int $size){
     
-    if ($size >= 1024 * 1024 * 1024) {
-        $size = round($size / (1024 * 1024 * 1024), 2) . ' GB';
-    } elseif ($size >= 1024 * 1024) {
-        $size = round($size / (1024 * 1024)) . ' MB';
-    } elseif ($size >= 1024) {
-        $size = round($size / 1024) . ' KB';
-    } else {
-        $size = $size . ' B';
-    }
-
-    return $size;
+    $base = log($size, 1024);
+    
+    $suffixes = array('B', 'KB', 'MB', 'GB', 'TB');
+    
+    return round(pow(1024, $base-floor($base)), 2) . ' ' . $suffixes[floor($base)];
+    
 }
 
 function _token_validate($token) {
