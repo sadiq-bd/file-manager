@@ -140,7 +140,7 @@
             <td></td>
             @endif
           @else
-          <td><input type="checkbox" name="fileSelect" value="{!! urlencode($file->fileName) !!}"></td>
+          <td><input type="checkbox" name="fileSelect" value="{!! rawurlencode($file->fileName) !!}"></td>
           <td><a href="{!! 
             $file->isDir ?
             route('index', [
@@ -156,7 +156,7 @@
           <td>{{ $file->fileMimeType }}</td>
           <td>{{ date('d M y H:i:s', $file->fileModificationTime) }}</td>
           <td>
-            <button onclick="renameFile('{!! urlencode($file->fileName) !!}')">rename</button>
+            <button onclick="renameFile('{!! rawurlencode($file->fileName) !!}')">rename</button>
             @if (!$file->isDir)
             <button onclick="window.location = '{!! 
               route('editFile', [
