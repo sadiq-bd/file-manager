@@ -157,14 +157,16 @@
           <td>{{ date('d M y H:i:s', $file->fileModificationTime) }}</td>
           <td>
             <button onclick="renameFile('{!! rawurlencode($file->fileName) !!}')">rename</button>
-            @if (!$file->isDir && preg_match('#text#i', $file->fileMimeType))
-            <button onclick="window.location = '{!! 
-              route('editFile', [
-                'dir' => $currentDir, 
-                'file' => $file->fileName,
-                '_token_' => _token_generate()
-              ]) 
-            !!}'">edit</button>
+            @if (!$file->isDir)
+              @if (preg_match('#text#i', $file->fileMimeType))
+                <button onclick="window.location = '{!! 
+                  route('editFile', [
+                    'dir' => $currentDir, 
+                    'file' => $file->fileName,
+                    '_token_' => _token_generate()
+                  ]) 
+                !!}'">edit</button>
+              @endif
             <button onclick="window.location = '{!!
               route('downloadFile', [
                 'dir' => $currentDir,
