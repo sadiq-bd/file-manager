@@ -157,7 +157,7 @@
           <td>{{ date('d M y H:i:s', $file->fileModificationTime) }}</td>
           <td>
             <button onclick="renameFile('{!! rawurlencode($file->fileName) !!}')">rename</button>
-            @if (!$file->isDir)
+            @if (!$file->isDir && preg_match('#text#i', $file->fileMimeType))
             <button onclick="window.location = '{!! 
               route('editFile', [
                 'dir' => $currentDir, 
