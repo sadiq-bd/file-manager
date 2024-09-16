@@ -7,6 +7,8 @@ use \App\Libraries\Zipper;
 
 class FileManagerController extends Controller
 {
+
+	public const FILES_DELIMITER = '/';
 	
     public function index(Request $request) {
 
@@ -286,8 +288,8 @@ class FileManagerController extends Controller
 		$absFile = $reqInfo['absFile'];
 
 		if (rtrim($absFile, '/') != $rootDir) {
-			if (strpos($requestFile, '|') !== false) {
-				$reqFiles = @explode('|', $requestFile);
+			if (strpos($requestFile, self::FILES_DELIMITER) !== false) {
+				$reqFiles = @explode(self::FILES_DELIMITER, $requestFile);
 			} else {
 				$reqFiles = [$requestFile];
 			}
@@ -328,8 +330,8 @@ class FileManagerController extends Controller
 		if (is_dir($absTo) && file_exists($absTo)) {
 
 			if (rtrim($absFile, '/') != $rootDir) {
-				if (strpos($requestFile, '|') !== false) {
-					$reqFiles = @explode('|', $requestFile);
+				if (strpos($requestFile, self::FILES_DELIMITER) !== false) {
+					$reqFiles = @explode(self::FILES_DELIMITER, $requestFile);
 				} else {
 					$reqFiles = [$requestFile];
 				}
@@ -374,8 +376,8 @@ class FileManagerController extends Controller
 		if (is_dir($absTo) && file_exists($absTo)) {
 
 			if (rtrim($absFile, '/') != $rootDir) {
-				if (strpos($requestFile, '|') !== false) {
-					$reqFiles = @explode('|', $requestFile);
+				if (strpos($requestFile, self::FILES_DELIMITER) !== false) {
+					$reqFiles = @explode(self::FILES_DELIMITER, $requestFile);
 				} else {
 					$reqFiles = [$requestFile];
 				}
@@ -416,8 +418,8 @@ class FileManagerController extends Controller
 		$absFile = $reqInfo['absFile'];
 
 		if (rtrim($absFile, '/') != $rootDir) {
-			if (strpos($requestFile, '|') !== false) {
-				$reqFiles = @explode('|', $requestFile);
+			if (strpos($requestFile, self::FILES_DELIMITER) !== false) {
+				$reqFiles = @explode(self::FILES_DELIMITER, $requestFile);
 			} else {
 				$reqFiles = [$requestFile];
 			}
@@ -466,8 +468,8 @@ class FileManagerController extends Controller
 		$absTo = $rootDir . '/' . $to;
 
 		if (rtrim($absFile, '/') != $rootDir) {
-			if (strpos($requestFile, '|') !== false) {
-				$reqFiles = @explode('|', $requestFile);
+			if (strpos($requestFile, self::FILES_DELIMITER) !== false) {
+				$reqFiles = @explode(self::FILES_DELIMITER, $requestFile);
 			} else {
 				$reqFiles = [$requestFile];
 			}

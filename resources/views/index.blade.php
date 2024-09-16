@@ -221,6 +221,7 @@
 <script>
 
   const chunkSize = {{ env('FILE_UPLOAD_CHUNK_SIZE', 1024*1024) }};
+  const filesDelimiter = '/';
   let uploadBtn = document.querySelector('#uploadBtn');
   let uploadId = null;
 
@@ -271,7 +272,7 @@
         let fname = file.name.length > 50 ? file.name.substring(0, 50) + '...' : file.name;
         let percentage = Math.round((((currentChunk + 1) * chunkSize ) / file.size) * 100);
         percentage = percentage > 100 ? 100 : percentage;
-        uploadBtn.innerHTML = 'Uploading '+ fname +' ( '+ percentage +' % )';
+        uploadBtn.innerHTML = currentFile + '. Uploading '+ fname +' ( '+ percentage +' % )';
       }
 
       let resp = await fetch('{{ route('completeUpload') }}', {
@@ -317,7 +318,7 @@
         'dir' => $currentDir,
         '_token_' => _token_generate()
       ])
-      !!}&type=" + type + '&file=' + newName;
+      !!}&type=" + type + '&file=' + encodeURIComponent(newName);
     }
     
   }
@@ -325,7 +326,7 @@
   function renameFile(file) {
     let newName = '';
     if (newName = prompt('Rename: ', file)) {
-      window.location = "{!! route('renameFile') !!}/?dir={!! $currentDir !!}&file=" + file + "&rename=" + newName + "&_token_={!! _token_generate() !!}";
+      window.location = "{!! route('renameFile') !!}/?dir={!! $currentDir !!}&file=" + file + "&rename=" + encodeURIComponent(newName) + "&_token_={!! _token_generate() !!}";
     }
   }
 
@@ -349,7 +350,7 @@
               'dir' => $currentDir, 
               '_token_' => _token_generate()
             ]) 
-        !!}&file=' + selected.join('|') + '&to=' + destination; 
+        !!}&file=' + encodeURIComponent(selected.join(filesDelimiter)) + '&to=' + encodeURIComponent(destination); 
     }
   }
 
@@ -362,7 +363,7 @@
               'dir' => $currentDir, 
               '_token_' => _token_generate()
             ]) 
-        !!}&file=' + selected.join('|') + '&to=' + destination; 
+        !!}&file=' + encodeURIComponent(selected.join(filesDelimiter)) + '&to=' + encodeURIComponent(destination); 
     }
   }
 
@@ -376,7 +377,7 @@
               'dir' => $currentDir, 
               '_token_' => _token_generate()
             ]) 
-        !!}&file=' + selected.join('|'); 
+        !!}&file=' + encodeURIComponent(selected.join(filesDelimiter)); 
       } 
     }
   }
@@ -389,7 +390,7 @@
               'dir' => $currentDir, 
               '_token_' => _token_generate()
             ]) 
-        !!}&file=' + selected.join('|'); 
+        !!}&file=' + encodeURIComponent(selected.join(filesDelimiter)); 
     }
   }
 
@@ -402,7 +403,7 @@
               'dir' => $currentDir, 
               '_token_' => _token_generate()
             ]) 
-        !!}&file=' + selected.join('|') + '&to=' + destination; 
+        !!}&file=' + encodeURIComponent(selected.join(filesDelimiter)) + '&to=' + encodeURIComponent(destination); 
     }
   }
 
