@@ -156,7 +156,7 @@
           <td>{{ $file->fileMimeType }}</td>
           <td>{{ date('d M y H:i:s', $file->fileModificationTime) }}</td>
           <td>
-            <button onclick="renameFile('{!! $file->fileName !!}')">rename</button>
+            <button onclick="renameFile('{!! addslashes($file->fileName) !!}')">rename</button>
             @if (!$file->isDir)
             <button onclick="window.location = '{!! 
               route('editFile', [
