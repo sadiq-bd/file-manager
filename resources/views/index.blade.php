@@ -140,7 +140,7 @@
             <td></td>
             @endif
           @else
-          <td><input type="checkbox" name="fileSelect" value="{!! $file->fileName !!}"></td>
+          <td><input type="checkbox" name="fileSelect" value="{!! addslashes($file->fileName) !!}"></td>
           <td><a href="{!! 
             $file->isDir ?
             route('index', [
@@ -156,7 +156,7 @@
           <td>{{ $file->fileMimeType }}</td>
           <td>{{ date('d M y H:i:s', $file->fileModificationTime) }}</td>
           <td>
-            <button onclick="renameFile('{!! addslashes($file->fileName) !!}')">rename</button>
+            <button onclick="renameFile(`{!! addslashes($file->fileName) !!}`)">rename</button>
             @if (!$file->isDir)
             <button onclick="window.location = '{!! 
               route('editFile', [
