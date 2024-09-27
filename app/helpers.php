@@ -89,6 +89,10 @@ function _get_file_list(string $dir, bool $asObj = false, bool $ignoreDotDirs = 
 					'fileModificationTime' => filemtime($absPath),
 					'isDir' => is_dir($absPath) && !is_file($absPath),
 				];
+
+                if ($asObj) {
+                    $fileList[$index] = (object) $fileList[$index];
+                }
 			}
 		}
 
