@@ -158,7 +158,7 @@
           <td>
             <button onclick="renameFile('{!! rawurlencode($file->fileName) !!}')">rename</button>
             @if (!$file->isDir)
-              @if (preg_match('#text#i', $file->fileMimeType))
+              @if (preg_match('#text|empty#i', $file->fileMimeType))
                 <button onclick="window.location = '{!! 
                   route('editFile', [
                     'dir' => $currentDir, 
