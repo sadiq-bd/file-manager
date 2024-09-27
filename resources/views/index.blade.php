@@ -141,18 +141,15 @@
           <td></td>
         </tr>
         @endif
+
         @foreach($fileList as $index => $file)
-        <tr>
-          <td><input type="checkbox" name="fileSelect" value="{!! rawurlencode($file->fileName) !!}"></td>
-          @if ($file->isDir)
-          <td><a href="{!! route('index', ['dir' => $currentDir . '/' . $file->fileName]) !!}">/&nbsp;{{ $file->fileName }}&nbsp;/</a></td>
-          @else
-          <td><a href="{!! route('viewFile', ['dir' => $currentDir, 'file' => $file->fileName, '_token_' => _token_generate()]) !!}" target="_blank">{{ $file->fileName }}</a></td>
-          @endif
+        <tr data-file="{!! rawurlencode($file->fileName) !!}" data-is-dir="{{ $file->isDir ? 'true' : 'false' }}">
+          <td><input type="checkbox" name="fileSelect"></td>
+          <td><a id="fileLink"></a></td>
           <td>{{ $file->isDir ? '' : _format_size($file->fileSize) }}</td>
           <td>{{ $file->fileMimeType }}</td>
           <td>{{ date('d M y H:i:s', $file->fileModificationTime) }}</td>
-          <td data-file="{!! rawurlencode($file->fileName) !!}">
+          <td>
           <button onclick="renameFile(this)">rename</button>
           @if (!$file->isDir)
             @if (preg_match('#text|empty#i', $file->fileMimeType))
@@ -323,7 +320,7 @@
 
   function editFile(file) {
     if (typeof file != 'string') {
-      file = file.parentElement.dataset.file;
+      file = file.parentElement.parentElement.dataset.file;
     }
     file = decodeURIComponent(file);
     window.location = "{!! route('editFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(file);
@@ -331,7 +328,7 @@
 
   function downloadFile(file) {
     if (typeof file != 'string') {
-      file = file.parentElement.dataset.file;
+      file = file.parentElement.parentElement.dataset.file;
     }
     file = decodeURIComponent(file);
     window.location = "{!! route('downloadFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(file);
@@ -339,7 +336,7 @@
 
   function deleteFile(file) {
     if (typeof file != 'string') {
-      file = file.parentElement.dataset.file;
+      file = file.parentElement.parentElement.dataset.file;
     }
     file = decodeURIComponent(file);
     if (confirm('Delete confirmation for file: ' + file)) {
@@ -391,6 +388,26 @@
     if (typeof confirm !== 'function' || typeof prompt !== 'function' ) {
       document.body.innerHTML = '<red><h2>Unsupported Browser! Please update your browser.</h2></red>';
     }
+
+    // set file checkbox values
+    document.querySelectorAll('input[name=fileSelect]').forEach(checkbox => {
+      checkbox.value = checkbox.parentElement.parentElement.dataset.file;
+    });
+    
+    // set file links
+    document.querySelectorAll('a#fileLink').forEach(link => {
+      let fname = decodeURIComponent(link.parentElement.parentElement.dataset.file);
+      let isDir = link.parentElement.parentElement.dataset.isDir;
+      if (isDir == 'true') {
+        link.href = "{!! route('index', ['dir' => $currentDir]) !!}" + encodeURIComponent("/" + fname);
+        link.innerHTML = '/&nbsp;' + fname.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") + '&nbsp;/';
+      } else {
+        link.href = "{!! route('viewFile', ['dir' => $currentDir, '_token_' => _token_generate()]) !!}&file=" + encodeURIComponent(fname);
+        link.innerText = fname;
+        link.target = '_blank';
+      }
+      
+    });
   });
 </script>
 
