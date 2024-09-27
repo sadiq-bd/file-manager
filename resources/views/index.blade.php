@@ -152,15 +152,15 @@
           <td>{{ $file->isDir ? '' : _format_size($file->fileSize) }}</td>
           <td>{{ $file->fileMimeType }}</td>
           <td>{{ date('d M y H:i:s', $file->fileModificationTime) }}</td>
-          <td>
-          <button onclick="renameFile('{!! rawurlencode($file->fileName) !!}')">rename</button>
+          <td data-file="{!! rawurlencode($file->fileName) !!}">
+          <button onclick="renameFile(this)">rename</button>
           @if (!$file->isDir)
             @if (preg_match('#text|empty#i', $file->fileMimeType))
-              <button onclick="editFile('{!! rawurlencode($file->fileName) !!}')">edit</button>
+              <button onclick="editFile(this)">edit</button>
             @endif
-          <button onclick="downloadFile('{!! rawurlencode($file->fileName) !!}')">download</button>
+          <button onclick="downloadFile(this)">download</button>
           @endif
-          <button onclick="deleteFile('{!! rawurlencode($file->fileName) !!}')">delete</button>
+          <button onclick="deleteFile(this)">delete</button>
           </td>
           @php
             if (!$file->isDir) { 
@@ -311,6 +311,9 @@
   }
 
   function renameFile(file) {
+    if (typeof file != 'string') {
+      file = file.parentElement.dataset.file;
+    }
     file = decodeURIComponent(file);
     let newName = prompt('Rename: ', file);
     if (newName != file) {
@@ -319,16 +322,25 @@
   }
 
   function editFile(file) {
+    if (typeof file != 'string') {
+      file = file.parentElement.dataset.file;
+    }
     file = decodeURIComponent(file);
     window.location = "{!! route('editFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(file);
   }
 
   function downloadFile(file) {
+    if (typeof file != 'string') {
+      file = file.parentElement.dataset.file;
+    }
     file = decodeURIComponent(file);
     window.location = "{!! route('downloadFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(file);
   }
 
   function deleteFile(file) {
+    if (typeof file != 'string') {
+      file = file.parentElement.dataset.file;
+    }
     file = decodeURIComponent(file);
     if (confirm('Delete confirmation for file: ' + file)) {
         window.location = "{!! route('deleteFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(file);
