@@ -316,7 +316,7 @@
     }
     file = decodeURIComponent(file);
     let newName = prompt('Rename: ', file);
-    if (newName != file) {
+    if (newName) {
       window.location = "{!! route('renameFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(file) + "&rename=" + encodeURIComponent(newName);
     }
   }
