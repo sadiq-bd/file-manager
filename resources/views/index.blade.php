@@ -99,7 +99,7 @@
       @endphp
       /&nbsp;<a style="text-decoration:none;" href="{!! route('index', ['dir'=>$cdirFinal]) !!}">{{ $cdir }}</a>
     @endforeach
-    &nbsp; <i onclick="navigator.clipboard.writeText('{{ $currentDir }}')">📋</i>
+    &nbsp; <i onclick="navigator.clipboard.writeText('{{ $currentDir }}')" style="cursor:pointer;">📋</i>
     </p>
 
     <div class="tbl-container">
@@ -330,8 +330,10 @@
 
   function deleteFile(file) {
     file = decodeURIComponent(file);
-    window.location = "{!! route('deleteFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(file);
-  }
+    if (confirm('Delete confirmation for file: ' + file)) {
+        window.location = "{!! route('deleteFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(file);
+    }  
+}
 
   function copySelected() {
     let selected = getSelectedFiles();
@@ -352,7 +354,7 @@
   function deleteSelected() {
     let selected = getSelectedFiles();
     if (selected.length > 0) {
-      if (confirm('Are you sure?')) { 
+      if (confirm('Are you sure want to delete '+selected.length+' files?')) { 
         window.location = "{!! route('deleteFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(selected.join(filesDelimiter)); 
       } 
     }
