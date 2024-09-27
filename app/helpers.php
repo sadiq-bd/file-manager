@@ -96,6 +96,8 @@ function _get_file_list(string $dir, bool $asObj = false) {
 }
 
 function _format_size(int $size){
+
+    if ($size <= 0) return 0;
     
     $base = log($size, 1024);
     
