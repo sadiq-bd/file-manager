@@ -65,11 +65,15 @@ function _clean_path($path) {
 }
 
 
-function _get_file_list(string $dir, bool $asObj = false) {
+function _get_file_list(string $dir, bool $asObj = false, bool $ignoreDotDirs = false) {
     
 		$fileList = [];
 		if (is_dir($dir) && file_exists($dir)) {
 			foreach(scandir($dir) as $index => $file) {
+
+                if ($ignoreDotDirs && ($file == '.' || $file == '..')) {
+                    continue;
+                }
 
 				$baseFile = $file;
 				$absPath = $dir . '/' . $baseFile;
@@ -89,7 +93,7 @@ function _get_file_list(string $dir, bool $asObj = false) {
 		}
 
         if ($asObj) {
-            return json_decode(json_encode($fileList), false);		// Object of Filelist
+            return (object) $fileList;		// Object of Filelist
         }
 
         return $fileList;

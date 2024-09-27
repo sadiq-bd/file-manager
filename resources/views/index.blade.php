@@ -99,6 +99,7 @@
       @endphp
       /&nbsp;<a style="text-decoration:none;" href="{!! route('index', ['dir'=>$cdirFinal]) !!}">{{ $cdir }}</a>
     @endforeach
+    &nbsp; <i onclick="navigator.clipboard.writeText('{{ $currentDir }}')">📋</i>
     </p>
 
     <div class="tbl-container">
@@ -119,79 +120,56 @@
           $totalDirs = 0;
           $totalSizeOfFiles = 0;
         @endphp
+
+        @if ($currentDir != '' && $currentDir != '.')
+        <tr>
+          <td></td>
+          <td><a href="" style="font-size: 24px; padding: 8px;">.</a></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        @endif
+        @if ($currentDir != '' && $currentDir != '.' && $currentDir != '..')
+        <tr>
+          <td></td>
+          <td><a style="font-size: 24px; padding: 8px;" href="{!! route('index', ['dir' => pathinfo($currentDir, PATHINFO_DIRNAME)]) !!}">..</a></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        @endif
         @foreach($fileList as $index => $file)
         <tr>
-          @if ($file->fileName == '.')
-            @if ($currentDir != '' && $currentDir != '.')
-            <td></td>
-            <td><a href="" style="font-size: 24px; padding: 8px;">.</a></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            @endif
-          @elseif ($file->fileName == '..')
-            @if ($currentDir != '' && $currentDir != '.' && $currentDir != '..')
-            <td></td>
-            <td><a style="font-size: 24px; padding: 8px;" href="{!! route('index', ['dir' => pathinfo($currentDir, PATHINFO_DIRNAME)]) !!}">..</a></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            @endif
-          @else
           <td><input type="checkbox" name="fileSelect" value="{!! rawurlencode($file->fileName) !!}"></td>
-          <td><a href="{!! 
-            $file->isDir ?
-            route('index', [
-              'dir' => $currentDir . '/' . $file->fileName
-            ]) :
-            route('viewFile', [
-              'dir' => $currentDir, 
-              'file' => $file->fileName,
-              '_token_' => _token_generate()
-            ]) 
-          !!}" {!! $file->isDir ? '' : 'target="_blank"' !!}>{!! $file->isDir ? '/&nbsp;' : '' !!}{{ $file->fileName }}{!! $file->isDir ? '&nbsp;/' : '' !!}</a></td>
+          @if ($file->isDir)
+          <td><a href="{!! route('index', ['dir' => $currentDir . '/' . $file->fileName]) !!}">/&nbsp;{{ $file->fileName }}&nbsp;/</a></td>
+          @else
+          <td><a href="{!! route('viewFile', ['dir' => $currentDir, 'file' => $file->fileName, '_token_' => _token_generate()]) !!}" target="_blank">{{ $file->fileName }}</a></td>
+          @endif
           <td>{{ $file->isDir ? '' : _format_size($file->fileSize) }}</td>
           <td>{{ $file->fileMimeType }}</td>
           <td>{{ date('d M y H:i:s', $file->fileModificationTime) }}</td>
           <td>
-            <button onclick="renameFile('{!! rawurlencode($file->fileName) !!}')">rename</button>
-            @if (!$file->isDir)
-              @if (preg_match('#text|empty#i', $file->fileMimeType))
-                <button onclick="window.location = '{!! 
-                  route('editFile', [
-                    'dir' => $currentDir, 
-                    'file' => $file->fileName,
-                    '_token_' => _token_generate()
-                  ]) 
-                !!}'">edit</button>
-              @endif
-            <button onclick="window.location = '{!!
-              route('downloadFile', [
-                'dir' => $currentDir,
-                'file' => $file->fileName,
-                '_token_' => _token_generate()
-              ])
-            !!}';">download</button>
+          <button onclick="renameFile('{!! rawurlencode($file->fileName) !!}')">rename</button>
+          @if (!$file->isDir)
+            @if (preg_match('#text|empty#i', $file->fileMimeType))
+              <button onclick="editFile('{!! rawurlencode($file->fileName) !!}')">edit</button>
             @endif
-            <button onclick="if (confirm('Are you sure?')) { window.location = '{!! 
-            route('deleteFile', [
-              'dir' => $currentDir, 
-              'file' => $file->fileName,
-              '_token_' => _token_generate()
-            ]) 
-            !!}'; } ">delete</button>
-          </td>
-            @php
-              if (!$file->isDir) { 
-                $totalSizeOfFiles += $file->fileSize;
-                $totalFiles++;
-              } else {
-                $totalDirs++;
-              }
-            @endphp
+          <button onclick="downloadFile('{!! rawurlencode($file->fileName) !!}')">download</button>
           @endif
+          <button onclick="deleteFile('{!! rawurlencode($file->fileName) !!}')">delete</button>
+          </td>
+          @php
+            if (!$file->isDir) { 
+              $totalSizeOfFiles += $file->fileSize;
+              $totalFiles++;
+            } else {
+              $totalDirs++;
+            }
+          @endphp
         </tr>
         @endforeach
         <tr>
@@ -220,26 +198,28 @@
 </main>
 <br><br>
 
-<script>
-
+<script type="text/javascript">
   const chunkSize = {{ env('FILE_UPLOAD_CHUNK_SIZE', 1024*1024) }};
   const filesDelimiter = '/';
-  let uploadBtn = document.querySelector('#uploadBtn');
-  let uploadId = null;
+  
 
-  document.querySelector('form#fileUploader').addEventListener('submit', async (e) => {
+  const fileUploadForm = document.querySelector('form#fileUploader');
+  const uploadBtn = document.querySelector('#uploadBtn');
+  fileUploadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    uploadBtn.setAttribute('disabled', true);
+    uploadBtn.setAttribute('disabled', "true");
+    fileUploadForm.setAttribute('disabled', "true");
     uploadBtn.innerHTML = 'Uploading File(s)... Please wait!';
     await uploadFiles();
   });
 
   async function uploadFiles() {
-      
     const fileInput = document.getElementById('fileInput');
     const files = fileInput.files;
 
+    let uploadId = null;
     let currentFile = 0;
+
     while (currentFile < files.length) {
       let file = files[currentFile];
       const totalChunks = Math.ceil(file.size / chunkSize);
@@ -300,6 +280,17 @@
     uploadBtn.innerHTML = 'Upload completed... reloading!';
     window.location.reload();
   }
+ 
+  function getSelectedFiles() {
+    let selectors = document.querySelectorAll('input[name=fileSelect]');
+    let selected = [];
+    selectors.forEach((slt, index) => {
+      if (slt.checked) {
+        selected.push(decodeURIComponent(slt.value));
+      }
+    });
+    return selected;
+  }
 
   function revertFilesSelection() {
     let selectors = document.querySelectorAll('input[name=fileSelect]');
@@ -313,47 +304,40 @@
   }
 
   function createItem(type) {
-    let newName = '';
-    if (newName = prompt(type + ' name: ')) {
-      window.location = "{!!
-      route('createItem', [
-        'dir' => $currentDir,
-        '_token_' => _token_generate()
-      ])
-      !!}&type=" + type + '&file=' + encodeURIComponent(newName);
-    }
-    
+    let newName = prompt(type.charAt(0).toUpperCase() + type.slice(1) + ' name: ');
+    if (newName) {
+      window.location = "{!! route('createItem', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&type=" + type + "&file=" + encodeURIComponent(newName);
+    } 
   }
 
   function renameFile(file) {
     file = decodeURIComponent(file);
-    let newName = '';
-    if (newName = prompt('Rename: ', file)) {
-      window.location = "{!! route('renameFile') !!}/?dir={!! $currentDir !!}&file=" + encodeURIComponent(file) + "&rename=" + encodeURIComponent(newName) + "&_token_={!! _token_generate() !!}";
+    let newName = prompt('Rename: ', file);
+    if (newName != file) {
+      window.location = "{!! route('renameFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(file) + "&rename=" + encodeURIComponent(newName);
     }
   }
 
-  function getSelectedFiles() {
-    let selectors = document.querySelectorAll('input[name=fileSelect]');
-    let selected = [];
-    selectors.forEach((slt, index) => {
-      if (slt.checked) {
-        selected.push(decodeURIComponent(slt.value));
-      }
-    });
-    return selected;
+  function editFile(file) {
+    file = decodeURIComponent(file);
+    window.location = "{!! route('editFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(file);
+  }
+
+  function downloadFile(file) {
+    file = decodeURIComponent(file);
+    window.location = "{!! route('downloadFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(file);
+  }
+
+  function deleteFile(file) {
+    file = decodeURIComponent(file);
+    window.location = "{!! route('deleteFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(file);
   }
 
   function copySelected() {
     let selected = getSelectedFiles();
     let destination = prompt('[Copy] Destination folder: ', '{{ $currentDir }}');
     if (selected.length > 0 && destination) {
-      window.location = '{!! 
-            route('copyFile', [
-              'dir' => $currentDir, 
-              '_token_' => _token_generate()
-            ]) 
-        !!}&file=' + encodeURIComponent(selected.join(filesDelimiter)) + '&to=' + encodeURIComponent(destination); 
+      window.location = "{!! route('copyFile', [ 'dir' => $currentDir,  '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(selected.join(filesDelimiter)) + "&to=" + encodeURIComponent(destination); 
     }
   }
 
@@ -361,26 +345,15 @@
     let selected = getSelectedFiles();
     let destination = prompt('[Move] Destination folder: ', '{{ $currentDir }}');
     if (selected.length > 0 && destination) {
-      window.location = '{!! 
-            route('moveFile', [
-              'dir' => $currentDir, 
-              '_token_' => _token_generate()
-            ]) 
-        !!}&file=' + encodeURIComponent(selected.join(filesDelimiter)) + '&to=' + encodeURIComponent(destination); 
+      window.location = "{!! route('moveFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(selected.join(filesDelimiter)) + "&to=" + encodeURIComponent(destination); 
     }
   }
 
   function deleteSelected() {
     let selected = getSelectedFiles();
-
     if (selected.length > 0) {
       if (confirm('Are you sure?')) { 
-        window.location = '{!! 
-            route('deleteFile', [
-              'dir' => $currentDir, 
-              '_token_' => _token_generate()
-            ]) 
-        !!}&file=' + encodeURIComponent(selected.join(filesDelimiter)); 
+        window.location = "{!! route('deleteFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(selected.join(filesDelimiter)); 
       } 
     }
   }
@@ -388,12 +361,7 @@
   function zipSelected() {
     let selected = getSelectedFiles();
     if (selected.length > 0) {
-      window.location = '{!! 
-            route('zipFile', [
-              'dir' => $currentDir, 
-              '_token_' => _token_generate()
-            ]) 
-        !!}&file=' + encodeURIComponent(selected.join(filesDelimiter)); 
+      window.location = "{!! route('zipFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(selected.join(filesDelimiter)); 
     }
   }
 
@@ -401,12 +369,7 @@
     let selected = getSelectedFiles();
     let destination = prompt('[Unzip] Destination folder: ', '{{ $currentDir }}');
     if (selected.length > 0 && destination) {
-      window.location = '{!! 
-            route('unzipFile', [
-              'dir' => $currentDir, 
-              '_token_' => _token_generate()
-            ]) 
-        !!}&file=' + encodeURIComponent(selected.join(filesDelimiter)) + '&to=' + encodeURIComponent(destination); 
+      window.location = "{!! route('unzipFile', [ 'dir' => $currentDir, '_token_' => _token_generate() ]) !!}&file=" + encodeURIComponent(selected.join(filesDelimiter)) + "&to=" + encodeURIComponent(destination); 
     }
   }
 

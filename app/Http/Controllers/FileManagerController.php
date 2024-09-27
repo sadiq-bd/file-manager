@@ -19,7 +19,7 @@ class FileManagerController extends Controller
 		$absDir = $reqInfo['absDir'];
 		$requestFile = $reqInfo['requestFile'];
 
-		$fileList = _get_file_list($absDir, true);
+		$fileList = _get_file_list($absDir, true, true);
 		
 		return view('index', compact(
 			'fileList',
