@@ -309,7 +309,7 @@
 
   function renameFile(file) {
     if (typeof file != 'string') {
-      file = file.parentElement.dataset.file;
+      file = file.parentElement.parentElement.dataset.file;
     }
     file = decodeURIComponent(file);
     let newName = prompt('Rename: ', file);
