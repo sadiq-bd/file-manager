@@ -67,42 +67,42 @@ function _clean_path($path) {
 
 function _get_file_list(string $dir, bool $asObj = false, bool $ignoreDotDirs = false) {
     
-		$fileList = [];
-		if (is_dir($dir) && file_exists($dir)) {
-			foreach(scandir($dir) as $index => $file) {
+	$fileList = [];
+	if (is_dir($dir) && file_exists($dir)) {
+		foreach(scandir($dir) as $index => $file) {
 
-                if ($ignoreDotDirs && ($file == '.' || $file == '..')) {
-                    continue;
-                }
+            if ($ignoreDotDirs && ($file == '.' || $file == '..')) {
+                continue;
+            }
 
-				$baseFile = $file;
-				$absPath = $dir . '/' . $baseFile;
+			$baseFile = $file;
+			$absPath = $dir . '/' . $baseFile;
 
-				@$fileList[$index] = [
-					'fileName' => $baseFile,
-					'fileSize' => filesize($absPath),
-					'fileType' => filetype($absPath),
-					'fileMimeType' => mime_content_type($absPath),
-					'fileOwner' => fileowner($absPath),
-					'fileGroup' => filegroup($absPath),
-					'filePermissions' => fileperms($absPath),
-					'fileModificationTime' => filemtime($absPath),
-					'isDir' => is_dir($absPath) && !is_file($absPath),
-				];
+			@$fileList[$index] = [
+				'fileName' => $baseFile,
+				'fileSize' => filesize($absPath),
+				'fileType' => filetype($absPath),
+				'fileMimeType' => mime_content_type($absPath),
+				'fileOwner' => fileowner($absPath),
+				'fileGroup' => filegroup($absPath),
+				'filePermissions' => fileperms($absPath),
+				'fileModificationTime' => filemtime($absPath),
+				'isDir' => is_dir($absPath) && !is_file($absPath),
+			];
 
-                if ($asObj) {
-                    $fileList[$index] = (object) $fileList[$index];
-                }
-			}
-		} else {
-            return false;
-        }
+            if ($asObj) {
+                $fileList[$index] = (object) $fileList[$index];
+            }
+		}
+	} else {
+        return false;
+    }
 
-        if ($asObj) {
-            return (object) $fileList;		// Object of Filelist
-        }
+    if ($asObj) {
+        return (object) $fileList;		// Object of Filelist
+    }
 
-        return $fileList;
+    return $fileList;
 }
 
 function _format_size(int $size){

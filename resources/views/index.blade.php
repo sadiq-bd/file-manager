@@ -73,7 +73,7 @@
 
 <main>
   <div class="container">
-  @if($fileList !== false && count((array)$fileList) > 0) 
+  @if($fileList !== false) 
     <button onclick="createItem('file');" class="bigBtn">Create New File</button>&nbsp;&nbsp;
     <button onclick="createItem('dir');" class="bigBtn">Create New Folder</button><br><br>
     <form id="fileUploader" style="border: 1px solid #666; padding: 10px;" action="{!!
