@@ -250,7 +250,7 @@
         let fname = file.name.length > 50 ? file.name.substring(0, 50) + '...' : file.name;
         let percentage = Math.round((((currentChunk + 1) * chunkSize ) / file.size) * 100);
         percentage = percentage > 100 ? 100 : percentage;
-        uploadBtn.innerHTML = currentFile + '. Uploading '+ fname +' ( '+ percentage +' % )';
+        uploadBtn.innerHTML = (currentFile + 1) + '. Uploading '+ fname +' ( '+ percentage +' % )';
       }
 
       let resp = await fetch('{{ route('completeUpload') }}', {
