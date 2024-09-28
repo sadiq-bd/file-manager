@@ -73,7 +73,7 @@
 
 <main>
   <div class="container">
-  @if(count((array)$fileList) > 0) 
+  @if($fileList !== false && count((array)$fileList) > 0) 
     <button onclick="createItem('file');" class="bigBtn">Create New File</button>&nbsp;&nbsp;
     <button onclick="createItem('dir');" class="bigBtn">Create New Folder</button><br><br>
     <form id="fileUploader" style="border: 1px solid #666; padding: 10px;" action="{!!
@@ -198,7 +198,6 @@
 <script type="text/javascript">
   const chunkSize = {{ env('FILE_UPLOAD_CHUNK_SIZE', 1024*1024) }};
   const filesDelimiter = '/';
-  
 
   const fileUploadForm = document.querySelector('form#fileUploader');
   const uploadBtn = document.querySelector('#uploadBtn');

@@ -94,7 +94,9 @@ function _get_file_list(string $dir, bool $asObj = false, bool $ignoreDotDirs = 
                     $fileList[$index] = (object) $fileList[$index];
                 }
 			}
-		}
+		} else {
+            return false;
+        }
 
         if ($asObj) {
             return (object) $fileList;		// Object of Filelist
