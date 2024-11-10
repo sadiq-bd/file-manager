@@ -29,7 +29,7 @@ function getClientIp() {
 
 function _get_request_info($dir = null, $file = null) {
 
-    $rootDir = rtrim(env('FILE_ROOT_DIR', ''), '/');
+    $rootDir = rtrim(config('filemanager.root_dir');
     
     $currentDir = $dir === null ? request()->input('dir', '') : $dir;
 
@@ -102,7 +102,7 @@ function _get_file_list(string $dir, bool $asObj = false, bool $ignoreDotDirs = 
         return (object) $fileList;		// Object of Filelist
     }
 
-    return $fileList;
+    return (array) $fileList;
 }
 
 function _format_size(int $size){
@@ -225,5 +225,5 @@ function moveDir($dir, $to, $shouldRemoveDirs = true) {
 
 
 function isUseShellCommandsForFileHandling() {
-    return (bool) env('USE_SHELL_COMMANDS_FOR_FILE_HANDLING', true);
+    return (bool) config('filemanager.use_shell_commands_for_file_handling');
 }

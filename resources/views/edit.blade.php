@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ env('APP_NAME', 'File Manager') }}</title>
+  <title>{{ config('app.name') }}</title>
 
   <style>
     * {
@@ -25,7 +25,7 @@
     }
 
     button {
-      border: 1px solid #eef;
+      border: 1px solid #000;
     }
 
     .bigBtn {
@@ -36,6 +36,24 @@
     input, textarea {
       border: 1px solid #eef;
       padding: 8px;
+    }
+    button:hover {
+      color: #eef;
+      background: #000;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      * {
+        background: #000;
+        color: #fff;
+      }
+      button {
+        border: 1px solid #eef;
+      }
+      button:hover {
+        color: #000;
+        background: #eef;
+      }
     }
 
   </style>

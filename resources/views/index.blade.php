@@ -3,13 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ env('APP_NAME', 'File Manager') }}</title>
+  <title>{{ config('app.name') }}</title>
 
   <style>
-    * {
-      background: #000;
-      color: #fff;
-    }
 
     html, body {
       margin: 0;
@@ -30,7 +26,7 @@
     }
 
     button {
-      border: 1px solid #eef;
+      border: 1px solid #000;
     }
 
     .bigBtn {
@@ -49,8 +45,8 @@
       margin: 4px;
     }
     button:hover {
-      color: #000;
-      background: #eef;
+      color: #eef;
+      background: #000;
     }
     .banner {
       position: fixed;
@@ -60,6 +56,20 @@
       text-align: center;
       max-height: 40px;
       padding: 8px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      * {
+        background: #000;
+        color: #fff;
+      }
+      button {
+        border: 1px solid #eef;
+      }
+      button:hover {
+        color: #000;
+        background: #eef;
+      }
     }
 
     @media (max-width: 768px) {
@@ -196,7 +206,7 @@
 <br><br>
 
 <script type="text/javascript">
-  const chunkSize = {{ env('FILE_UPLOAD_CHUNK_SIZE', 1024*1024) }};
+  const chunkSize = {{ config('filemanager.upload_chunk_size') }};
   const filesDelimiter = '/';
 
   const fileUploadForm = document.querySelector('form#fileUploader');
@@ -250,7 +260,7 @@
         let fname = file.name.length > 50 ? file.name.substring(0, 50) + '...' : file.name;
         let percentage = Math.round((((currentChunk + 1) * chunkSize ) / file.size) * 100);
         percentage = percentage > 100 ? 100 : percentage;
-        uploadBtn.innerHTML = (currentFile + 1) + '. Uploading '+ fname +' ( '+ percentage +' % )';
+        uploadBtn.innerHTML = (currentFile + 1) + '. Uploading "'+ fname +'" ( '+ percentage +' % )';
       }
 
       let resp = await fetch('{{ route('completeUpload') }}', {
@@ -410,7 +420,7 @@
   });
 </script>
 
-<div class="banner" style="color: #888;">This File Manager is Developed by <a href="https://sadiq.us.to" target="_blank">Sadiq</a></div>
+<div class="banner" style="color: #888;">This File Manager is Developed by <a href="https://sadiq.us.to" target="_blank">Sadiq</a>. v{{ config('filemanager.version') }}</div>
 
 </body>
 </html>

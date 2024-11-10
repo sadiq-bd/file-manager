@@ -60,12 +60,12 @@ class FileManagerController extends Controller
         $absFile = $reqInfo['absFile'];
 
         if (file_exists($absFile) && is_file($absFile)) {
-            if (env('NGINX_X_SENDFILE_PATH', '')) {
+            if (config('filemanager.nginx_x_sendfile_path')) {
 				return response('', 200, [
 					'Content-Type' => mime_content_type($absFile),
                 	'Content-Disposition' => 'attachment; filename="' . $requestFile . '"',
 					'X-Accel-Redirect' => '/' 
-						. trim(env('NGINX_X_SENDFILE_PATH'), '/') 
+						. trim(config('filemanager.nginx_x_sendfile_path'), '/') 
 						. '/' 
 						. _clean_path($currentDir) 
 						. '/'
@@ -97,7 +97,7 @@ class FileManagerController extends Controller
         $fileName = $request->input('file');
         $uploadId = $request->input('upload_id');
 
-        $chunkPath = env('FILE_TEMP_DIR', '') . '/' . $uploadId . '/' . $chunkNumber;
+        $chunkPath = config('filemanager.temp_dir') . '/' . $uploadId . '/' . $chunkNumber;
         $file->move(dirname($chunkPath), basename($chunkPath));
 
         return response()->json(['status' => 'success']);
@@ -133,7 +133,7 @@ class FileManagerController extends Controller
         $fileHandle = fopen($fname, 'a');
 
         for ($i = 1; $i <= $totalChunks; $i++) {
-            $chunkPath = env('FILE_TEMP_DIR', '') . '/' . $uploadId . '/' . $i;
+            $chunkPath = config('filemanager.temp_dir') . '/' . $uploadId . '/' . $i;
             $chunkHandle = fopen($chunkPath, 'r');
             stream_copy_to_stream($chunkHandle, $fileHandle);
             fclose($chunkHandle);
@@ -141,7 +141,7 @@ class FileManagerController extends Controller
         }
 
         fclose($fileHandle);
-        rmdir(env('FILE_TEMP_DIR', '') . '/' . $uploadId); // Delete the chunk directory
+        rmdir(config('filemanager.temp_dir') . '/' . $uploadId); // Delete the chunk directory
 
         return response()->json(['status' => 'success']);
     }

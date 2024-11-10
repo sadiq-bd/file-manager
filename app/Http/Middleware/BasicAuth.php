@@ -15,15 +15,19 @@ class BasicAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($auth = $request->header('Authorization', '')) {
-            $auth = @explode(' ', $auth)[1];
-            
-            if (password_verify($auth, env('BASIC_AUTH_CRED', ''))) {
-                return $next($request);
+        if (config('filemanager.basic_auth_cred')) {
+            if ($auth = $request->header('Authorization', '')) {
+                $auth = @explode(' ', $auth, 2)[1];
+                
+                if (password_verify($auth, config('filemanager.basic_auth_cred'))) {
+                    return $next($request);
+                }
             }
+            return response(null, 401, [
+                'WWW-Authenticate' => 'Basic realm="'.config('app.name').'"'
+            ]);
+        } else {
+            return $next($request);
         }
-        return response(null, 401, [
-            'WWW-Authenticate' => 'Basic realm=sadiqserver'
-        ]);
     }
 }
