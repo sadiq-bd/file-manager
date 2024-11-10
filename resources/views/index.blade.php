@@ -69,6 +69,9 @@
         color: #000;
         background: #eef;
       }
+      .banner {
+        background: #000;
+      }
     }
 
     @media (max-width: 768px) {
