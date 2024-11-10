@@ -29,7 +29,7 @@ function getClientIp() {
 
 function _get_request_info($dir = null, $file = null) {
 
-    $rootDir = rtrim(config('filemanager.root_dir');
+    $rootDir = rtrim(config('filemanager.root_dir'));
     
     $currentDir = $dir === null ? request()->input('dir', '') : $dir;
 
