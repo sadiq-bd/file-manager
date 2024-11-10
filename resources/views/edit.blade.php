@@ -6,16 +6,10 @@
   <title>{{ config('app.name') }}</title>
 
   <style>
-    * {
-      background: #000;
-      color: #fff;
-    }
-
     html, body {
       margin: 0;
       padding: 0;
     }
-
     .container {
       text-align: center;
       margin: 10px;
@@ -23,16 +17,13 @@
       border: 1px solid #666;
       overflow-x: auto;
     }
-
     button {
       border: 1px solid #000;
     }
-
     .bigBtn {
       font-size: 15px;
       padding: 10px;
     }
-
     input, textarea {
       border: 1px solid #eef;
       padding: 8px;

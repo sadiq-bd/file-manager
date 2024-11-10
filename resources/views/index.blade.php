@@ -6,12 +6,10 @@
   <title>{{ config('app.name') }}</title>
 
   <style>
-
     html, body {
       margin: 0;
       padding: 0;
     }
-
     .container {
       text-align: center;
       margin: 10px;
@@ -56,6 +54,7 @@
       text-align: center;
       max-height: 40px;
       padding: 8px;
+      background: #fff;
     }
 
     @media (prefers-color-scheme: dark) {
