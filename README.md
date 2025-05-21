@@ -1,3 +1,4 @@
+<p align="left"> <img src="https://api.sadiq.us.to/app/github/repo/file-manager/views?nocache=true" alt="" /> </p>
 # Simple File Manager
 
 Simple File Manager for managing files on the server
