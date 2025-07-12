@@ -86,7 +86,7 @@ This project is licensed under the [MIT License](https://choosealicense.com/lice
 
 ## 📬 Contact & Links
 
-- **Author:** [Sadiq Hossain](https://github.com/sadiq-bd)
+- **Author:** [Sadiq Ahmed](https://github.com/sadiq-bd)
 - **Repository:** [github.com/sadiq-bd/file-manager](https://github.com/sadiq-bd/file-manager)
 
 ---
