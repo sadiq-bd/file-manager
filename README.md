@@ -3,7 +3,7 @@
 A lightweight and intuitive PHP-based file manager for managing server files with ease. Perfect for developers, sysadmins, or anyone who needs to quickly navigate, upload, and manage server-side files via a clean web interface.
 
 <p align="left">
-  <img src="https://api.sadiq.us.to/app/github/repo/file-manager/views?nocache=true" alt="Repo Views" />
+  <img src="https://api.sadiq.workers.dev/app/github/repo/file-manager/views?nocache=true" alt="Repo Views" />
 </p>
 
 ---
